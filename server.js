@@ -29,13 +29,33 @@ app.post("/todos", (req, res) => {
   const { title } = req.body;
 
   if (!title || title.trim() === "") {
-    return res.status(400).json({ error: "Title is required" });
+    return res.status(400).json({ error: "Title is required..." });
   }
 
   const newTodo = { id: nextId++, title, completed: false };
   todos.push(newTodo);
 
   res.status(201).json(newTodo);
+});
+
+app.put("/todos/:id", (req, res) => {
+  const { id } = req.params;
+  const todo = todos.find((todo) => todo.id === Number(id));
+
+  if (!todo) {
+    return res.status(400).json({ error: "Todo not found.." });
+  }
+
+  const { title, completed } = req.body;
+
+  if (title && title.trim() === "") {
+    return res.status(400).json({ error: "Title cannot be empty..." });
+  }
+
+  if (title !== undefined) todo.title = title;
+  if (completed !== undefined) todo.completed = completed;
+
+  return res.status(200).json(todo);
 });
 
 app.listen(3000, () => {
