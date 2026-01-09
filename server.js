@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 
-const todos = [
+let todos = [
   { id: 0, title: "cook", completed: false },
   { id: 1, title: "vacuum", completed: false },
   { id: 2, title: "laundry", completed: false },
@@ -54,6 +54,19 @@ app.put("/todos/:id", (req, res) => {
 
   if (title !== undefined) todo.title = title;
   if (completed !== undefined) todo.completed = completed;
+
+  return res.status(200).json(todo);
+});
+
+app.delete("/todos/:id", (req, res) => {
+  const { id } = req.params;
+  const todo = todos.find((todo) => todo.id === Number(id));
+
+  if (!todo) {
+    return res.status(404).send("Todo not found...");
+  }
+
+  todos = todos.filter((t) => t.id !== Number(id));
 
   return res.status(200).json(todo);
 });
