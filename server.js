@@ -1,61 +1,68 @@
 const express = require("express");
 const app = express();
-
-let todos = [
-  { id: 0, title: "cook", completed: false },
-  { id: 1, title: "vacuum", completed: false },
-  { id: 2, title: "laundry", completed: false },
-];
-
-let nextId = Math.max(...todos.map((todo) => todo.id)) + 1;
+const pool = require("./db");
 
 app.use(express.json());
 
-app.get("/todos", (req, res) => {
+app.get("/todos", async (req, res) => {
+  const q = await pool.query("SELECT * FROM todos");
+  const todos = q.rows;
   res.json({ todos });
 });
 
-app.get("/todos/:id", (req, res) => {
+app.get("/todos/:id", async (req, res) => {
   const { id } = req.params;
-  const todo = todos.find((item) => item.id === Number(id));
+  console.log(id);
+  const q = await pool.query("SELECT * FROM todos WHERE id = $1", [id]);
+  const todo = q.rows[0];
 
   if (!todo) {
     return res.status(404).send("Todo not found...");
   }
-  res.json({ todo });
+
+  res.json(todo);
 });
 
-app.post("/todos", (req, res) => {
+app.post("/todos", async (req, res) => {
   const { title } = req.body;
 
   if (!title || title.trim() === "") {
     return res.status(400).json({ error: "Title is required..." });
   }
 
-  const newTodo = { id: nextId++, title, completed: false };
-  todos.push(newTodo);
+  const q = await pool.query(
+    "INSERT INTO todos(title) VALUES($1) RETURNING *",
+    [title]
+  );
+  const todo = q.rows[0];
 
-  res.status(201).json(newTodo);
+  res.status(201).json(todo);
 });
 
-app.put("/todos/:id", (req, res) => {
+app.put("/todos/:id", async (req, res) => {
   const { id } = req.params;
-  const todo = todos.find((todo) => todo.id === Number(id));
-
-  if (!todo) {
-    return res.status(400).json({ error: "Todo not found.." });
-  }
-
   const { title, completed } = req.body;
 
   if (title && title.trim() === "") {
     return res.status(400).json({ error: "Title cannot be empty..." });
   }
 
-  if (title !== undefined) todo.title = title;
-  if (completed !== undefined) todo.completed = completed;
+  const existingTodo = await pool.query("SELECT * FROM todos WHERE id = $1", [
+    id,
+  ]);
+  const todo = existingTodo.rows[0];
 
-  return res.status(200).json(todo);
+  if (!todo) return res.status(404).json({ error: "Todo not found" });
+
+  const updatedTitle = title !== undefined ? title : todo.title;
+  const updatedCompleted = completed !== undefined ? completed : todo.completed;
+
+  const result = await pool.query(
+    "UPDATE todos SET title = $1, completed = $2 WHERE id = $3 RETURNING *",
+    [updatedTitle, updatedCompleted, id]
+  );
+
+  return res.status(200).json(result.rows[0]);
 });
 
 app.delete("/todos/:id", (req, res) => {
