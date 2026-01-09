@@ -65,17 +65,15 @@ app.put("/todos/:id", async (req, res) => {
   return res.status(200).json(result.rows[0]);
 });
 
-app.delete("/todos/:id", (req, res) => {
+app.delete("/todos/:id", async (req, res) => {
   const { id } = req.params;
-  const todo = todos.find((todo) => todo.id === Number(id));
+  const q = await pool.query("DELETE FROM todos WHERE id = $1", [id]);
 
-  if (!todo) {
+  if (q.rowCount === 0) {
     return res.status(404).send("Todo not found...");
   }
 
-  todos = todos.filter((t) => t.id !== Number(id));
-
-  return res.status(200).json(todo);
+  return res.sendStatus(204);
 });
 
 app.listen(3000, () => {
