@@ -1,1 +1,16 @@
-
+name: Todo Api Deploy
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    name: Build Todo Api
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Executing remote SSH into EC2"
+        uses: "appleboy/ssh-action@v1"
+        with:
+          host: ${{ secrets.TODO_API_HOST }}
+          key: ${{ secrets.TODO_API_SSH }}
+          script: whoami
