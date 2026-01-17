@@ -13,4 +13,5 @@ jobs:
         with:
           host: ${{ secrets.TODO_API_HOST }}
           key: ${{ secrets.TODO_API_SSH }}
+          username: ${{ secrets.USERNAME }}
           script: whoami
