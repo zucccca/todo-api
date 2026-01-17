@@ -8,6 +8,7 @@ jobs:
     name: Build Todo Api
     runs-on: ubuntu-latest
     steps:
+      - run: echo "Logging into EC2..."
       - name: "Executing remote SSH into EC2"
         uses: "appleboy/ssh-action@v1"
         with:
