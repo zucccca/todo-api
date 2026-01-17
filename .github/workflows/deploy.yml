@@ -12,7 +12,7 @@ jobs:
       - name: "Executing remote SSH into EC2"
         uses: "appleboy/ssh-action@v1"
         with:
-          host: ${{ secrets.TODO_API_HOST }}
-          key: ${{ secrets.TODO_API_SSH }}
+          host: ${{ secrets.HOST }}
+          key: ${{ secrets.SSH }}
           username: ${{ secrets.USERNAME }}
           script: whoami
