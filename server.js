@@ -7,6 +7,10 @@ const pool = require("./db");
 app.use(cors());
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.json({ message: "CI/CD is working! I am heading to the gym." });
+});
+
 app.get("/todos", async (req, res) => {
   const q = await pool.query("SELECT * FROM todos");
   const todos = q.rows;
@@ -35,7 +39,7 @@ app.post("/todos", async (req, res) => {
 
   const q = await pool.query(
     "INSERT INTO todos(title) VALUES($1) RETURNING *",
-    [title]
+    [title],
   );
   const todo = q.rows[0];
 
@@ -62,7 +66,7 @@ app.put("/todos/:id", async (req, res) => {
 
   const result = await pool.query(
     "UPDATE todos SET title = $1, completed = $2 WHERE id = $3 RETURNING *",
-    [updatedTitle, updatedCompleted, id]
+    [updatedTitle, updatedCompleted, id],
   );
 
   return res.status(200).json(result.rows[0]);
