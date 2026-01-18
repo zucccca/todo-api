@@ -15,4 +15,9 @@ jobs:
           host: ${{ secrets.HOST }}
           key: ${{ secrets.SSH }}
           username: ${{ secrets.USERNAME }}
-          script: whoami
+          script: |
+            cd ~/todo-api
+            git checkout main
+            git pull origin main
+            npm install
+            pm2 restart todo-api
