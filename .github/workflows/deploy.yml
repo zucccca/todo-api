@@ -17,6 +17,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           script: |
             cd ~/todo-api
+            git reset --hard
             git checkout main
             git pull origin main
             npm install
