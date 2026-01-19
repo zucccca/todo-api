@@ -8,7 +8,17 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.json({ message: "CI/CD is working! I am heading to the gym." });
+  res.json({ message: "CI/CD is working!" });
+});
+
+app.get("/db-test", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT NOW()");
+    res.json({ status: "success", time: result.rows[0].now });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Database connection failed" });
+  }
 });
 
 app.get("/todos", async (req, res) => {
