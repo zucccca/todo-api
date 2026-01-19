@@ -17,8 +17,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           script: |
             cd ~/todo-api
-            git reset --hard
-            git checkout main
-            git pull origin main
+            git fetch origin main 
+            git reset --hard origin/main # Forcefully move the pointer to match GitHub exactly
             npm install
             pm2 restart todo-api
